@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNTRO - Comparte tu mundo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="logo.png" type="image/png">
+</head>
+<body>
+
+    <!-- ===== FONDO DE FINCA GANADERA ===== -->
+    <div class="fondo-finca"></div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="logo.png" alt="SYNTRO" class="nav-logo">
+            <span class="nav-title">SYNTRO</span>
+        </div>
+        <div class="nav-links">
+            <a href="#mision">Misión</a>
+            <a href="#vision">Visión</a>
+            <a href="#objetivo">Objetivo</a>
+            <a href="#galeria">Galería</a>
+        </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <header class="hero">
+        <div class="hero-content">
+            <img src="logo.png" alt="SYNTRO Logo" class="hero-logo">
+            <p class="hero-tagline">Sube, guarda y comparte tus fotos y videos en un solo lugar.</p>
+            <a href="#mision" class="btn-hero">Conocer más</a>
+        </div>
+    </header>
+
+    <!-- ===== MISIÓN ===== -->
+    <section id="mision" class="info-section">
+        <div class="info-card">
+            <div class="info-icon">🎯</div>
+            <h2>Misión</h2>
+            <p>
+                En SYNTRO nos dedicamos a conectar a las personas con el campo y la vida rural,
+                compartiendo el valor del trabajo ganadero y agrícola a través de imágenes y videos
+                que inspiran, educan y preservan nuestras tradiciones.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===== VISIÓN ===== -->
+    <section id="vision" class="info-section">
+        <div class="info-card">
+            <div class="info-icon">🌱</div>
+            <h2>Visión</h2>
+            <p>
+                Ser la plataforma líder en contenido rural y ganadero de habla hispana,
+                reconocida por promover el amor por la tierra, la sostenibilidad y el
+                desarrollo del campo, siendo un puente entre el productor y el mundo.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===== OBJETIVO ===== -->
+    <section id="objetivo" class="info-section">
+        <div class="info-card">
+            <div class="info-icon">🏆</div>
+            <h2>Objetivo</h2>
+            <p>
+                Crear una comunidad digital donde cada persona pueda subir, guardar y compartir
+                sus fotos y videos, documentando la vida en el campo, el manejo del ganado y
+                las mejores prácticas del sector agropecuario para las generaciones futuras.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===== GALERÍA ===== -->
+    <section id="galeria" class="gallery-section">
+        <h2>Galería SYNTRO</h2>
+
+        <div class="gallery-filters">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="image">Fotos</button>
+            <button class="filter-btn" data-filter="video">Videos</button>
+        </div>
+
+        <div class="gallery" id="gallery">
+            <p class="empty-msg">Pronto habrá contenido nuevo en nuestra galería 🌱</p>
+        </div>
+    </section>
+
+    <!-- ===== REDES SOCIALES ===== -->
+    <section class="redes-section">
+        <h2>Síguenos en nuestras redes</h2>
+        <div class="redes-grid">
+            <a href="https://www.instagram.com/syntro_academy" target="_blank" class="red-card instagram">
+                <span class="red-icon">📷</span>
+                <span class="red-name">Instagram</span>
+                <span class="red-user">@syntro_academy</span>
+            </a>
+            <a href="https://www.facebook.com/syntroacademy" target="_blank" class="red-card facebook">
+                <span class="red-icon">👍</span>
+                <span class="red-name">Facebook</span>
+                <span class="red-user">Syntro Academy</span>
+            </a>
+            <a href="https://www.tiktok.com/@syntro_academy" target="_blank" class="red-card tiktok">
+                <span class="red-icon">🎵</span>
+                <span class="red-name">TikTok</span>
+                <span class="red-user">@syntro_academy</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== MODAL DE CONTRASEÑA ===== -->
+    <div id="password-modal" class="password-modal">
+        <div class="password-box">
+            <h2>🔐 Acceso Restringido</h2>
+            <p>Solo el administrador puede acceder</p>
+            <input type="password" id="password-input" placeholder="Contraseña" autocomplete="off">
+            <div class="password-actions">
+                <button id="password-submit" class="btn-primary">Entrar</button>
+                <button id="password-cancel" class="btn-secondary">Cancelar</button>
+            </div>
+            <p id="password-error" class="password-error"></p>
+        </div>
+    </div>
+
+    <!-- ===== PANEL OCULTO DE SUBIDA (solo visible tras login) ===== -->
+    <section id="upload-panel" class="upload-panel">
+        <div class="upload-panel-content">
+            <button class="close-panel" id="close-panel">✕</button>
+            <h2>🔐 Panel de Administrador</h2>
+            <p class="admin-note">Sesión activa. Puedes subir o eliminar archivos.</p>
+
+            <div class="drop-zone" id="drop-zone">
+                <p>📁 Arrastra tus fotos y videos aquí</p>
+                <p class="sub-texto">o haz clic para seleccionarlos</p>
+                <input type="file" id="file-input" class="drop-zone__input" multiple accept="image/*,video/*">
+            </div>
+
+            <div class="upload-actions">
+                <button id="upload-btn" class="btn-primary">📤 Seleccionar Archivos</button>
+                <button id="clear-btn" class="btn-secondary">🗑️ Limpiar Galería</button>
+            </div>
+
+            <div id="progress-bar" class="progress-bar" style="display:none;">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+
+            <button id="logout-btn" class="btn-logout">🚪 Cerrar Sesión</button>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <p>© 2025 SYNTRO — Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- ===== MODAL DE ARCHIVO ===== -->
+    <div id="modal" class="modal">
+        <span class="modal-close">&times;</span>
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
