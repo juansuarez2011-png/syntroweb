@@ -1,15 +1,17 @@
 // ========================================
-// SYNTRO — Panel oculto con contraseña
-// Abre con: Ctrl + Shift + S
+// SYNTRO — Subida de fotos y videos
+// Con contraseña: Ctrl + Shift + S
 // ========================================
 
 const DB_NAME = 'syntro_db';
 const DB_VERSION = 2;
 const STORE_NAME = 'archivos';
-const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
-// 🔐 CONTRASEÑA DEL ADMINISTRADOR — CAMBIA ESTO POR LA QUE QUIERAS
+// 🔐 CONTRASEÑA — cambia esto por la tuya
 const PASSWORD_ADMIN = 'syntro2025';
+
+// 📦 Tamaño máximo por archivo (en bytes). 200 MB
+const MAX_FILE_SIZE = 200 * 1024 * 1024;
 
 let db;
 let isAdmin = false;
@@ -96,7 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closePanel = document.getElementById('close-panel');
     const logoutBtn = document.getElementById('logout-btn');
 
-    // Elementos del modal de contraseña
     const passwordModal = document.getElementById('password-modal');
     const passwordInput = document.getElementById('password-input');
     const passwordSubmit = document.getElementById('password-submit');
@@ -110,21 +111,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ATAJOS DE TECLADO
     // ========================================
     document.addEventListener('keydown', (e) => {
-        // Ctrl + Shift + S → abrir modal de contraseña
         if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
             e.preventDefault();
             if (isAdmin) {
-                // Si ya está logueado, abrir el panel directamente
                 uploadPanel.classList.add('visible');
             } else {
-                // Si no, pedir contraseña
                 passwordModal.classList.add('active');
                 passwordError.textContent = '';
                 passwordInput.value = '';
                 setTimeout(() => passwordInput.focus(), 100);
             }
         }
-        // ESC → cerrar todo
         if (e.key === 'Escape') {
             if (modal.classList.contains('active')) {
                 modal.classList.remove('active');
@@ -159,10 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             isAdmin = true;
             document.body.classList.add('admin-mode');
             passwordModal.classList.remove('active');
-            passwordError.textContent = '';
-            passwordInput.value = '';
             uploadPanel.classList.add('visible');
-            console.log('✅ Sesión de admin iniciada');
         } else {
             passwordError.textContent = '❌ Contraseña incorrecta';
             passwordInput.value = '';
@@ -170,15 +164,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Botón cerrar sesión    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', () => {
         isAdmin = false;
         document.body.classList.remove('admin-mode');
         uploadPanel.classList.remove('visible');
         renderGallery();
-        console.log('🚪 Sesión cerrada');
     });
 
-    // Botón de cerrar panel
     closePanel.addEventListener('click', () => {
         uploadPanel.classList.remove('visible');
     });
@@ -242,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             overlay.querySelector('.item-delete').addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (!isAdmin) return; // Solo admin puede borrar
+                if (!isAdmin) return;
                 if (confirm('¿Eliminar este archivo?')) {
                     const cachedUrl = urlCache.get(file.id);
                     if (cachedUrl) {
@@ -319,10 +311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     async function handleFiles(files) {
-        if (!isAdmin) {
-            alert('⚠️ Solo el administrador puede subir archivos.');
-            return;
-        }
+        if (!isAdmin) return;
 
         const progressBar = document.getElementById('progress-bar');
         const progressFill = document.getElementById('progress-fill');
@@ -339,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             if (f.size > MAX_FILE_SIZE) {
-                rejectedFiles.push(`${f.name} (${(f.size/1024/1024).toFixed(1)} MB - supera 100 MB)`);
+                rejectedFiles.push(`${f.name} (${(f.size/1024/1024).toFixed(1)} MB - supera 200 MB)`);
                 return;
             }
             validFiles.push(f);
@@ -362,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 progressFill.style.width = `${(done / validFiles.length) * 100}%`;
             } catch (err) {
                 console.error('Error:', err);
-                alert('Error al guardar: ' + file.name);
+                alert('Error al guardar: ' + file.name + '\n' + err.message);
             }
         }
 
@@ -394,5 +383,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     await renderGallery();
-    console.log('🌱 SYNTRO listo. Presiona Ctrl + Shift + S para acceder al panel.');
+    console.log('🌱 SYNTRO listo. Presiona Ctrl + Shift + S para subir archivos.');
 });
