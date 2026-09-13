@@ -279,7 +279,6 @@ body {
     line-height: 1;
 }
 
-/* Solo mostrar botones de eliminar si estamos en modo admin */
 body:not(.admin-mode) .item-delete { display: none !important; }
 
 .empty-msg {
@@ -368,12 +367,6 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     width: 100%;
     text-align: center;
     box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-    animation: slideUp 0.4s ease;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .password-box h2 {
@@ -396,19 +389,13 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     border-radius: 10px;
     margin-bottom: 15px;
     outline: none;
-    transition: border 0.3s;
     text-align: center;
     letter-spacing: 3px;
 }
 
-.password-box input:focus {
-    border-color: var(--verde-claro);
-}
+.password-box input:focus { border-color: var(--verde-claro); }
 
-.password-actions {
-    display: flex;
-    gap: 10px;
-}
+.password-actions { display: flex; gap: 10px; }
 
 .password-actions button {
     flex: 1;
@@ -418,26 +405,16 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     cursor: pointer;
     font-weight: bold;
     border: none;
-    transition: all 0.3s;
 }
 
-.password-actions .btn-primary {
-    background: var(--azul-oscuro);
-    color: white;
-}
-.password-actions .btn-primary:hover {
-    background: var(--verde-oscuro);
-}
-
+.password-actions .btn-primary { background: var(--azul-oscuro); color: white; }
+.password-actions .btn-primary:hover { background: var(--verde-oscuro); }
 .password-actions .btn-secondary {
     background: transparent;
     color: var(--azul-oscuro);
     border: 2px solid var(--azul-oscuro);
 }
-.password-actions .btn-secondary:hover {
-    background: var(--azul-oscuro);
-    color: white;
-}
+.password-actions .btn-secondary:hover { background: var(--azul-oscuro); color: white; }
 
 .password-error {
     color: #e74c3c !important;
@@ -447,7 +424,7 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     font-size: 0.9rem !important;
 }
 
-/* ===== PANEL OCULTO DE SUBIDA ===== */
+/* ===== PANEL DE SUBIDA ===== */
 .upload-panel {
     position: fixed;
     top: 0; left: 0;
@@ -463,10 +440,7 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     transition: opacity 0.4s ease;
 }
 
-.upload-panel.visible {
-    display: flex;
-    opacity: 1;
-}
+.upload-panel.visible { display: flex; opacity: 1; }
 
 .upload-panel-content {
     background: white;
@@ -476,7 +450,6 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     width: 100%;
     text-align: center;
     position: relative;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -494,10 +467,7 @@ body:not(.admin-mode) .item-delete { display: none !important; }
 
 .close-panel:hover { color: #e74c3c; }
 
-.upload-panel h2 {
-    color: var(--azul-oscuro);
-    margin-bottom: 8px;
-}
+.upload-panel h2 { color: var(--azul-oscuro); margin-bottom: 8px; }
 
 .admin-note {
     color: var(--verde-oscuro);
@@ -518,10 +488,7 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     transition: all 0.3s;
 }
 
-.btn-logout:hover {
-    background: #e74c3c;
-    color: white;
-}
+.btn-logout:hover { background: #e74c3c; color: white; }
 
 /* ===== DROP ZONE ===== */
 .drop-zone {
@@ -625,7 +592,6 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     max-width: 90vw;
     max-height: 85vh;
     border-radius: 10px;
-    box-shadow: 0 0 40px rgba(76,217,182,0.4);
 }
 
 /* ===== FOOTER ===== */
@@ -648,6 +614,5 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     .info-card p { text-align: left; }
     .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     .gallery-item img, .gallery-item video { height: 150px; }
-    .upload-panel-content { padding: 30px 20px; }
     .redes-grid { grid-template-columns: 1fr; }
 }
