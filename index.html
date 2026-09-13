@@ -9,10 +9,8 @@
 </head>
 <body>
 
-    <!-- ===== FONDO DE FINCA ===== -->
     <div class="fondo-finca"></div>
 
-    <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <div class="nav-brand">
             <img src="logo.png" alt="SYNTRO" class="nav-logo">
@@ -26,7 +24,6 @@
         </div>
     </nav>
 
-    <!-- ===== HERO ===== -->
     <header class="hero">
         <div class="hero-content">
             <img src="logo.png" alt="SYNTRO Logo" class="hero-logo">
@@ -35,7 +32,6 @@
         </div>
     </header>
 
-    <!-- ===== MISIÓN ===== -->
     <section id="mision" class="info-section">
         <div class="info-card">
             <div class="info-icon">🎯</div>
@@ -48,7 +44,6 @@
         </div>
     </section>
 
-    <!-- ===== VISIÓN ===== -->
     <section id="vision" class="info-section">
         <div class="info-card">
             <div class="info-icon">🌱</div>
@@ -61,7 +56,6 @@
         </div>
     </section>
 
-    <!-- ===== OBJETIVO ===== -->
     <section id="objetivo" class="info-section">
         <div class="info-card">
             <div class="info-icon">🏆</div>
@@ -74,22 +68,18 @@
         </div>
     </section>
 
-    <!-- ===== GALERÍA ===== -->
     <section id="galeria" class="gallery-section">
         <h2>Galería SYNTRO</h2>
-
         <div class="gallery-filters">
             <button class="filter-btn active" data-filter="all">Todos</button>
             <button class="filter-btn" data-filter="image">Fotos</button>
             <button class="filter-btn" data-filter="video">Videos</button>
         </div>
-
         <div class="gallery" id="gallery">
-            <p class="empty-msg">Pronto habrá contenido nuevo en nuestra galería 🌱</p>
+            <p class="empty-msg">Cargando galería... 🌱</p>
         </div>
     </section>
 
-    <!-- ===== REDES SOCIALES ===== -->
     <section class="redes-section">
         <h2>Síguenos en nuestras redes</h2>
         <div class="redes-grid">
@@ -111,7 +101,7 @@
         </div>
     </section>
 
-    <!-- ===== MODAL DE CONTRASEÑA ===== -->
+    <!-- MODAL CONTRASEÑA -->
     <div id="password-modal" class="password-modal">
         <div class="password-box">
             <h2>🔐 Acceso Restringido</h2>
@@ -125,7 +115,7 @@
         </div>
     </div>
 
-    <!-- ===== PANEL OCULTO DE SUBIDA ===== -->
+    <!-- PANEL DE SUBIDA -->
     <section id="upload-panel" class="upload-panel">
         <div class="upload-panel-content">
             <button class="close-panel" id="close-panel">✕</button>
@@ -151,17 +141,17 @@
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <p>© 2025 SYNTRO Academy — Todos los derechos reservados.</p>
     </footer>
 
-    <!-- ===== MODAL DE ARCHIVO ===== -->
     <div id="modal" class="modal">
         <span class="modal-close">&times;</span>
         <div class="modal-content" id="modal-content"></div>
     </div>
 
+    <!-- SUPABASE LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 </html>
