@@ -1,89 +1,30 @@
 // ========================================
-// SYNTRO — Subida de fotos y videos
-// Con contraseña: Ctrl + Shift + S
+// SYNTRO - Con Supabase (nube real)
+// Todos ven las mismas fotos
 // ========================================
 
-const DB_NAME = 'syntro_db';
-const DB_VERSION = 2;
-const STORE_NAME = 'archivos';
+// 🔑 CREDENCIALES DE SUPABASE
+const SUPABASE_URL = 'https://iwwasjqwftubzuxzvdgw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JwVQwjDOqM4DnMsQ6Lkbtg_tniMyEPa';
+const BUCKET_NAME = 'syntro-media';
 
-// 🔐 CONTRASEÑA — cambia esto por la tuya
+// 🔐 Contraseña del admin
 const PASSWORD_ADMIN = 'syntro2025';
 
-// 📦 Tamaño máximo por archivo (en bytes). 200 MB
-const MAX_FILE_SIZE = 200 * 1024 * 1024;
+// 📦 Límite de archivo: 50 MB (límite del bucket)
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-let db;
+// Inicializar cliente Supabase
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let isAdmin = false;
-
-// ---------- Base de datos ----------
-function initDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => { db = request.result; resolve(db); };
-        request.onupgradeneeded = (e) => {
-            const database = e.target.result;
-            if (database.objectStoreNames.contains(STORE_NAME)) {
-                database.deleteObjectStore(STORE_NAME);
-            }
-            database.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-        };
-    });
-}
-
-function saveFile(file) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const record = {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            blob: file,
-            date: new Date().toISOString()
-        };
-        const req = store.add(record);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-function getAllFiles() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const req = store.getAll();
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-function deleteFile(id) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const req = store.delete(id);
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-    });
-}
-
-function clearAll() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const req = store.clear();
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-    });
-}
+let currentFilter = 'all';
+let allFiles = [];
 
 // ========================================
-// Interfaz
+// INTERFAZ
 // ========================================
-document.addEventListener('DOMContentLoaded', async () => {
-    await initDB();
+document.addEventListener('DOMContentLoaded', () => {
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -103,9 +44,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const passwordSubmit = document.getElementById('password-submit');
     const passwordCancel = document.getElementById('password-cancel');
     const passwordError = document.getElementById('password-error');
-
-    let currentFilter = 'all';
-    const urlCache = new Map();
 
     // ========================================
     // ATAJOS DE TECLADO
@@ -137,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ========================================
-    // MODAL DE CONTRASEÑA
+    // CONTRASEÑA
     // ========================================
     passwordSubmit.addEventListener('click', checkPassword);
     passwordInput.addEventListener('keydown', (e) => {
@@ -157,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.classList.add('admin-mode');
             passwordModal.classList.remove('active');
             uploadPanel.classList.add('visible');
+            renderGallery();
         } else {
             passwordError.textContent = '❌ Contraseña incorrecta';
             passwordInput.value = '';
@@ -182,15 +121,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ========================================
-    // Galería
+    // GALERÍA (LEE DESDE SUPABASE)
     // ========================================
-    async function renderGallery() {
-        const files = await getAllFiles();
+    async function loadFilesFromSupabase() {
+        try {
+            const { data, error } = await supabaseClient
+                .storage
+                .from(BUCKET_NAME)
+                .list('', {
+                    limit: 1000,
+                    sortBy: { column: 'created_at', order: 'desc' }
+                });
+
+            if (error) throw error;
+
+            allFiles = (data || []).filter(f => f.name && f.name !== '.emptyFolderPlaceholder').map(f => {
+                const { data: urlData } = supabaseClient
+                    .storage
+                    .from(BUCKET_NAME)
+                    .getPublicUrl(f.name);
+
+                const ext = f.name.split('.').pop().toLowerCase();
+                const isVideo = ['mp4', 'mov', 'webm', 'avi', 'mkv', 'm4v'].includes(ext);
+
+                return {
+                    name: f.name,
+                    url: urlData.publicUrl,
+                    type: isVideo ? 'video' : 'image',
+                    date: f.created_at,
+                    size: f.metadata ? f.metadata.size : 0
+                };
+            });
+
+            renderGallery();
+        } catch (err) {
+            console.error('Error cargando archivos:', err);
+            gallery.innerHTML = '<p class="empty-msg">Error al cargar. Verifica tu conexión.</p>';
+        }
+    }
+
+    function renderGallery() {
         gallery.innerHTML = '';
 
-        const filtered = files.filter(f => {
+        const filtered = allFiles.filter(f => {
             if (currentFilter === 'all') return true;
-            return f.type.startsWith(currentFilter + '/');
+            return f.type === currentFilter;
         });
 
         if (filtered.length === 0) {
@@ -198,37 +173,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
         filtered.forEach(file => {
             const item = document.createElement('div');
             item.className = 'gallery-item';
 
-            let url = urlCache.get(file.id);
-            if (!url) {
-                url = URL.createObjectURL(file.blob);
-                urlCache.set(file.id, url);
-            }
-
             let media;
-            if (file.type.startsWith('image/')) {
+            if (file.type === 'image') {
                 media = document.createElement('img');
-                media.src = url;
+                media.src = file.url;
                 media.alt = file.name;
                 media.loading = 'lazy';
             } else {
                 media = document.createElement('video');
-                media.src = url;
+                media.src = file.url;
                 media.muted = true;
                 media.preload = 'metadata';
             }
 
-            media.addEventListener('click', () => openModal(file, url));
+            media.addEventListener('click', () => openModal(file));
 
             const overlay = document.createElement('div');
             overlay.className = 'item-overlay';
+            const sizeMB = file.size ? (file.size / 1024 / 1024).toFixed(2) + ' MB' : '';
             overlay.innerHTML = `
-                <span>${file.type.startsWith('image/') ? '📷' : '🎬'} ${(file.size/1024/1024).toFixed(2)} MB</span>
+                <span>${file.type === 'image' ? '📷' : '🎬'} ${sizeMB}</span>
                 <button class="item-delete" title="Eliminar">×</button>
             `;
 
@@ -236,13 +204,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 e.stopPropagation();
                 if (!isAdmin) return;
                 if (confirm('¿Eliminar este archivo?')) {
-                    const cachedUrl = urlCache.get(file.id);
-                    if (cachedUrl) {
-                        URL.revokeObjectURL(cachedUrl);
-                        urlCache.delete(file.id);
+                    const { error } = await supabaseClient
+                        .storage
+                        .from(BUCKET_NAME)
+                        .remove([file.name]);
+
+                    if (error) {
+                        alert('Error al eliminar: ' + error.message);
+                        return;
                     }
-                    await deleteFile(file.id);
-                    renderGallery();
+                    loadFilesFromSupabase();
                 }
             });
 
@@ -252,15 +223,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function openModal(file, url) {
+    function openModal(file) {
         modalContent.innerHTML = '';
-        if (file.type.startsWith('image/')) {
+        if (file.type === 'image') {
             const img = document.createElement('img');
-            img.src = url;
+            img.src = file.url;
             modalContent.appendChild(img);
         } else {
             const video = document.createElement('video');
-            video.src = url;
+            video.src = file.url;
             video.controls = true;
             video.autoplay = true;
             modalContent.appendChild(video);
@@ -281,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ========================================
-    // Subida
+    // SUBIR ARCHIVOS A SUPABASE
     // ========================================
     uploadBtn.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('click', () => fileInput.click());
@@ -318,27 +289,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         progressBar.style.display = 'block';
         progressFill.style.width = '0%';
 
-        const allFiles = [...files];
+        const allFilesArray = [...files];
         const validFiles = [];
-        const rejectedFiles = [];
+        const rejected = [];
 
-        allFiles.forEach(f => {
+        allFilesArray.forEach(f => {
             if (!f.type.startsWith('image/') && !f.type.startsWith('video/')) {
-                rejectedFiles.push(`${f.name} (formato no permitido)`);
+                rejected.push(`${f.name} (formato no permitido)`);
                 return;
             }
             if (f.size > MAX_FILE_SIZE) {
-                rejectedFiles.push(`${f.name} (${(f.size/1024/1024).toFixed(1)} MB - supera 200 MB)`);
+                rejected.push(`${f.name} (${(f.size/1024/1024).toFixed(1)} MB - supera 50 MB)`);
                 return;
             }
             validFiles.push(f);
         });
 
-        if (rejectedFiles.length > 0) {
-            alert('⚠️ Algunos archivos no se subieron:\n\n' + rejectedFiles.join('\n'));
+        if (rejected.length) {
+            alert('⚠️ Algunos archivos no se subieron:\n\n' + rejected.join('\n'));
         }
-
-        if (validFiles.length === 0) {
+        if (!validFiles.length) {
             progressBar.style.display = 'none';
             return;
         }
@@ -346,12 +316,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         let done = 0;
         for (const file of validFiles) {
             try {
-                await saveFile(file);
+                const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+                const { error } = await supabaseClient
+                    .storage
+                    .from(BUCKET_NAME)
+                    .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) throw error;
+
                 done++;
                 progressFill.style.width = `${(done / validFiles.length) * 100}%`;
             } catch (err) {
-                console.error('Error:', err);
-                alert('Error al guardar: ' + file.name + '\n' + err.message);
+                console.error('Error subiendo:', err);
+                alert('Error al subir: ' + file.name + '\n' + (err.message || err));
             }
         }
 
@@ -360,19 +341,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             progressFill.style.width = '0%';
         }, 600);
 
-        await renderGallery();
+        await loadFilesFromSupabase();
     }
 
+    // ========================================
+    // LIMPIAR TODO
+    // ========================================
     clearBtn.addEventListener('click', async () => {
         if (!isAdmin) return;
-        if (confirm('¿Eliminar TODOS los archivos?')) {
-            urlCache.forEach(url => URL.revokeObjectURL(url));
-            urlCache.clear();
-            await clearAll();
-            renderGallery();
+        if (!confirm('¿Eliminar TODOS los archivos de la galería?')) return;
+
+        const fileNames = allFiles.map(f => f.name);
+        if (!fileNames.length) return;
+
+        const { error } = await supabaseClient
+            .storage
+            .from(BUCKET_NAME)
+            .remove(fileNames);
+
+        if (error) {
+            alert('Error: ' + error.message);
+            return;
         }
+        loadFilesFromSupabase();
     });
 
+    // ========================================
+    // FILTROS
+    // ========================================
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             filterBtns.forEach(b => b.classList.remove('active'));
@@ -382,6 +378,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    await renderGallery();
-    console.log('🌱 SYNTRO listo. Presiona Ctrl + Shift + S para subir archivos.');
+    // ========================================
+    // INICIO
+    // ========================================
+    loadFilesFromSupabase();
+    console.log('🌱 SYNTRO + Supabase listo. Ctrl + Shift + S para subir.');
 });
