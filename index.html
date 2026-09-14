@@ -130,7 +130,13 @@
 
             <div class="upload-actions">
                 <button id="upload-btn" class="btn-primary">📤 Seleccionar Archivos</button>
-                <button id="clear-btn" class="btn-secondary">🗑️ Limpiar Galería</button>
+                <button id="toggle-select-btn" class="btn-secondary">☑️ Modo Selección</button>
+            </div>
+
+            <div id="multi-actions" class="multi-actions" style="display:none;">
+                <button id="select-all-btn" class="btn-secondary">✅ Seleccionar Todos</button>
+                <button id="deselect-all-btn" class="btn-secondary">❌ Deseleccionar</button>
+                <button id="delete-selected-btn" class="btn-danger">🗑️ Eliminar Seleccionados (0)</button>
             </div>
 
             <div id="progress-bar" class="progress-bar" style="display:none;">
@@ -150,7 +156,6 @@
         <div class="modal-content" id="modal-content"></div>
     </div>
 
-    <!-- SUPABASE LIBRARY -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
