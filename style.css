@@ -605,6 +605,94 @@ body:not(.admin-mode) .item-delete { display: none !important; }
     background: rgba(255,255,255,0.9);
 }
 
+/* ===== MODO SELECCIÓN ===== */
+.multi-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(76, 217, 182, 0.1);
+    border-radius: 12px;
+    border: 2px dashed var(--verde-claro);
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.btn-danger:disabled {
+    background-color: #bbb;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.gallery-item .item-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 3px solid white;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    z-index: 10;
+    display: none;
+    transition: all 0.2s ease;
+}
+
+body.selection-mode .gallery-item .item-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-item .item-checkbox:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+.gallery-item.selected .item-checkbox {
+    background: var(--verde-claro);
+    border-color: white;
+}
+
+.gallery-item.selected .item-checkbox::after {
+    content: "✓";
+    color: var(--azul-oscuro);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.gallery-item.selected {
+    outline: 4px solid var(--verde-claro);
+    outline-offset: -4px;
+    transform: scale(0.98);
+}
+
+body.selection-mode .gallery-item .item-delete {
+    display: none;
+}
+
+body:not(.admin-mode) .item-checkbox {
+    display: none !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
     .hero-logo { width: 160px; }
